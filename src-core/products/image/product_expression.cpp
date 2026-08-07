@@ -206,6 +206,13 @@ namespace satdump
                     try
                     {
                         equParser.SetExpr(expression);
+
+                        // Re-register user functions after SetExpr() call, as it clears them
+                        for (auto &l : lut_cfgs)
+                            equParser.DefineFunUserData(l.token.c_str(), lutProcess, &img);
+                        for (auto &e : equp_cfgs)
+                            equParser.DefineFunUserData(e.token.c_str(), equpProcess, &img);
+
                         equParser.Eval(outValsCnt);
                         if (numout != nullptr)
                             *numout = outValsCnt;
