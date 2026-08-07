@@ -79,7 +79,11 @@ cd build
 $build_args="-DCMAKE_TOOLCHAIN_FILE=$($(Get-Item ..\scripts\buildsystems\vcpkg.cmake).FullName)", "-DVCPKG_TARGET_TRIPLET=$platform", "-DCMAKE_INSTALL_PREFIX=$($(Get-Item ..\installed\$platform).FullName)", "-DCMAKE_BUILD_TYPE=Release", "-A", $generator
 $standard_include=$(Get-Item ..\installed\$platform\include).FullName
 $standard_lib=$(Get-Item ..\installed\$platform\lib).FullName
-$pthread_lib=$(Get-Item ..\installed\$platform\lib\pthreadVC3.lib).FullName
+Write-Output "=== Contents of lib directory ==="
+Get-ChildItem ..\installed\$platform\lib\pthread* -Name
+Write-Output "================================="
+#$pthread_lib=$(Get-Item ..\installed\$platform\lib\pthreadVC3.lib).FullName
+$pthread_lib=$(Get-ChildItem ..\installed\$platform\lib\pthread*.lib | Select-Object -First 1).FullName
 $libusb_include=$(Get-Item ..\installed\$platform\include\libusb-1.0).FullName
 $libusb_lib=$(Get-Item ..\installed\$platform\lib\libusb-1.0.lib).FullName
 if($env:PROCESSOR_ARCHITECTURE -ne $arch)
