@@ -101,18 +101,6 @@ for($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
                                     boost-assign boost-dll
 
 #Start Building Dependencies
-
-$standard_include = (Get-Item ..\installed\$platform\include).FullName
-$standard_lib = (Get-Item ..\installed\$platform\lib).FullName
-
-$pthreadPath = ..\installed\$platform\lib\pthreadVC3.lib
-if(-not (Test-Path $pthreadPath)) {
-    Write-Error "Missing pthreadVC3.lib at '$pthreadPath'. This likely means the vcpkg install step failed earlier. Check vcpkg output/logs and vcpkg/buildtrees for failures."
-    exit 1
-}
-$pthread_lib = (Get-Item $pthreadPath).FullName
-
-
 $null = mkdir build
 cd build
 $build_args="-DCMAKE_TOOLCHAIN_FILE=$($(Get-Item ..\scripts\buildsystems\vcpkg.cmake).FullName)", "-DVCPKG_TARGET_TRIPLET=$platform", "-DCMAKE_INSTALL_PREFIX=$($(Get-Item ..\installed\$platform).FullName)", "-DCMAKE_BUILD_TYPE=Release", "-A", $generator
