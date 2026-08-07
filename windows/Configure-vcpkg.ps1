@@ -61,9 +61,36 @@ if($env:PROCESSOR_ARCHITECTURE -ne $arch)
 #Setup vcpkg
 Write-Output "Configuring vcpkg..."
 cd "$(Split-Path -Parent $MyInvocation.MyCommand.Path)\.."
-git clone https://github.com/microsoft/vcpkg -b 2025.01.13
-cd vcpkg
+#git clone https://github.com/microsoft/vcpkg -b 2025.01.13
+git clone https://github.com/microsoft/vcpkg
+cd vcpkg\
+
+# Ensure latest (clone fresh should be latest; optional safe pull if needed)
+try { git pull --ff-only } catch { Write-Output "vcpkg is fresh or pull failed; continuing..." }
+
 .\bootstrap-vcpkg.bat
+
+# Core packages. libxml2 is for libiio
+# Add a small retry loop around vcpkg install to reduce impact of transient mirror failures
+$installCmd = '.\vcpkg install --triplet {0} pthreads libjpeg-turbo tiff libpng glfw3 libusb fftw3 libxml2 portaudio nng zstd armadillo opencl curl[schannel] hdf5[cpp] sqlite3' -f $platform
+$maxAttempts = 3
+for($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
+    try {
+        Write-Output "Running vcpkg install (attempt $attempt of $maxAttempts)..."
+        iex $installCmd
+        Write-Output "vcpkg install completed."
+        break
+    } catch {
+        Write-Output "vcpkg install attempt $attempt failed: $($_.Exception.Message)"
+        if($attempt -eq $maxAttempts) {
+            Write-Error "vcpkg install failed after $maxAttempts attempts. Inspect vcpkg logs in vcpkg\\buildtrees and vcpkg\\packages for details."
+            throw
+        } else {
+            Write-Output "Waiting 10 seconds before retry..."
+            Start-Sleep -Seconds 10
+        }
+    }
+}
 
 # Core packages. libxml2 is for libiio
 .\vcpkg install --triplet $platform pthreads libjpeg-turbo tiff libpng glfw3 libusb fftw3 libxml2 portaudio nng zstd armadillo opencl curl[schannel] hdf5[cpp] sqlite3
@@ -74,16 +101,30 @@ cd vcpkg
                                     boost-assign boost-dll
 
 #Start Building Dependencies
+
+$standard_include = (Get-Item ..\installed\$platform\include).FullName
+$standard_lib = (Get-Item ..\installed\$platform\lib).FullName
+
+$pthreadPath = ..\installed\$platform\lib\pthreadVC3.lib
+if(-not (Test-Path $pthreadPath)) {
+    Write-Error "Missing pthreadVC3.lib at '$pthreadPath'. This likely means the vcpkg install step failed earlier. Check vcpkg output/logs and vcpkg/buildtrees for failures."
+    exit 1
+}
+$pthread_lib = (Get-Item $pthreadPath).FullName
+
+
 $null = mkdir build
 cd build
 $build_args="-DCMAKE_TOOLCHAIN_FILE=$($(Get-Item ..\scripts\buildsystems\vcpkg.cmake).FullName)", "-DVCPKG_TARGET_TRIPLET=$platform", "-DCMAKE_INSTALL_PREFIX=$($(Get-Item ..\installed\$platform).FullName)", "-DCMAKE_BUILD_TYPE=Release", "-A", $generator
 $standard_include=$(Get-Item ..\installed\$platform\include).FullName
 $standard_lib=$(Get-Item ..\installed\$platform\lib).FullName
-Write-Output "=== Contents of lib directory ==="
-Get-ChildItem ..\installed\$platform\lib\pthread* -Name
-Write-Output "================================="
+$pthreadPath = ..\installed\$platform\lib\pthreadVC3.lib
+if(-not (Test-Path $pthreadPath)) {
+    Write-Error "Missing pthreadVC3.lib at '$pthreadPath'. This likely means the vcpkg install step failed earlier. Check vcpkg output/logs and vcpkg/buildtrees for failures."
+    exit 1
+}
+$pthread_lib = (Get-Item $pthreadPath).FullName
 #$pthread_lib=$(Get-Item ..\installed\$platform\lib\pthreadVC3.lib).FullName
-$pthread_lib=$(Get-ChildItem ..\installed\$platform\lib\pthread*.lib | Select-Object -First 1).FullName
 $libusb_include=$(Get-Item ..\installed\$platform\include\libusb-1.0).FullName
 $libusb_lib=$(Get-Item ..\installed\$platform\lib\libusb-1.0.lib).FullName
 if($env:PROCESSOR_ARCHITECTURE -ne $arch)
