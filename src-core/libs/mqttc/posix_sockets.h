@@ -1,5 +1,7 @@
-#include <unistd.h>
 #if !defined(__POSIX_SOCKET_TEMPLATE_H__)
+#if !defined(WIN32)
+#include <unistd.h>
+#endif
 #define __POSIX_SOCKET_TEMPLATE_H__
 
 #include <stdio.h>

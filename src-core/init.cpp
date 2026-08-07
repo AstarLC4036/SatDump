@@ -35,8 +35,8 @@ extern "C"
 namespace satdump
 {
     SATDUMP_DLL std::string user_path;
-    SATDUMP_DLL std::string tle_file_override = "";
-    SATDUMP_DLL bool tle_do_update_on_init = true;
+    std::string tle_file_override = "";
+    bool tle_do_update_on_init = true;
 
     SATDUMP_DLL std::shared_ptr<DBHandler> db;
     SATDUMP_DLL std::shared_ptr<KeplerDBHandler> db_keplers;
