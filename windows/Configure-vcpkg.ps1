@@ -72,7 +72,8 @@ try { git pull --ff-only } catch { Write-Output "vcpkg is fresh or pull failed; 
 
 # Core packages. libxml2 is for libiio
 # Add a small retry loop around vcpkg install to reduce impact of transient mirror failures
-$installCmd = '.\vcpkg install --triplet {0} pthreads libjpeg-turbo tiff libpng glfw3 libusb fftw3 libxml2 portaudio nng zstd armadillo opencl curl[schannel] hdf5[cpp] sqlite3' -f $platform
+#$installCmd = '.\vcpkg install --triplet {0} pthreads libjpeg-turbo tiff libpng glfw3 libusb fftw3 libxml2 portaudio nng zstd armadillo opencl curl[schannel] hdf5[cpp] sqlite3' -f $platform
+$installCmd = '.\vcpkg install --triplet {0} pthreads libjpeg-turbo tiff libpng glfw3 libusb fftw3 libxml2 portaudio nng zstd armadillo opencl curl hdf5[cpp] sqlite3' -f $platform
 $maxAttempts = 3
 for($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
     try {
@@ -93,7 +94,7 @@ for($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
 }
 
 # Core packages. libxml2 is for libiio
-.\vcpkg install --triplet $platform pthreads libjpeg-turbo tiff libpng glfw3 libusb fftw3 libxml2 portaudio nng zstd armadillo opencl curl[schannel] hdf5[cpp] sqlite3
+#.\vcpkg install --triplet $platform pthreads libjpeg-turbo tiff libpng glfw3 libusb fftw3 libxml2 portaudio nng zstd armadillo opencl curl[schannel] hdf5[cpp] sqlite3
 
 # Entirely for UHD...
 .\vcpkg install --triplet $platform boost-chrono boost-date-time boost-filesystem boost-program-options boost-system boost-serialization boost-thread `
