@@ -161,7 +161,7 @@ cmake $build_args -DENABLE_TESTING=OFF -DENABLE_MODTOOL=OFF ..
 cmake --build . --config Release
 cmake --install .
 cd ..\..
-rm -recurse -force volk
+rm -recurse -force volk -ErrorAction SilentlyContinue
 
 Write-Output "Building Airspy..."
 #git clone https://github.com/airspy/airspyone_host --depth 1 #-b v1.0.10
@@ -173,7 +173,7 @@ cmake $build_args -DLIBUSB_INCLUDE_DIR="$($libusb_include)" -DLIBUSB_LIBRARIES="
 cmake --build . --config Release
 cmake --install .
 cd ..\..\..
-rm -recurse -force airspyone_host
+rm -recurse -force airspyone_host -ErrorAction SilentlyContinue
 
 Write-Output "Building Airspy HF..."
 #git clone https://github.com/airspy/airspyhf --depth 1 #-b 1.6.8
@@ -185,7 +185,7 @@ cmake $build_args -DLIBUSB_INCLUDE_DIR="$($libusb_include)" -DLIBUSB_LIBRARIES="
 cmake --build . --config Release
 cmake --install .
 cd ..\..\..
-rm -recurse -force airspyhf
+rm -recurse -force airspyhf -ErrorAction SilentlyContinue
 
 Write-Output "Building RTL-SDR..."
 #git clone https://github.com/osmocom/rtl-sdr --depth 1 -b v2.0.2
@@ -209,7 +209,7 @@ cmake $build_args -DLIBUSB_INCLUDE_DIR="$($libusb_include)" -DLIBUSB_LIBRARIES="
 cmake --build . --config Release
 cmake --install .
 cd ..\..\..\..
-rm -recurse -force hackrf
+rm -recurse -force hackrf -ErrorAction SilentlyContinue
 
 Write-Output "Building HydraSDR..."
 git clone https://github.com/hydrasdr/rfone_host -b v1.0.1 #TODO: Patch for Raw IO support to avoid sample drops?
@@ -220,7 +220,7 @@ cmake $build_args -DLIBUSB_INCLUDE_DIR="$($libusb_include)" -DLIBUSB_LIBRARIES="
 cmake --build . --config Release
 cmake --install .
 cd ..\..\..
-rm -recurse -force rfone_host
+rm -recurse -force rfone_host -ErrorAction SilentlyContinue
 
 Write-Output "Building FobosSDR..."
 git clone https://github.com/rigexpert/libfobos -b v.2.2.2 #TODO: Patch for Raw IO support to avoid sample drops?
@@ -251,7 +251,7 @@ cmake $build_args -DWITH_IIOD=OFF -DWITH_TESTS=OFF -DWITH_ZSTD=ON -DLIBUSB_INCLU
 cmake --build . --config Release
 cmake --install .
 cd ..\..
-rm -recurse -force libiio
+rm -recurse -force libiio -ErrorAction SilentlyContinue
 
 Write-Output "Building libad9361-iio..."
 git clone https://github.com/analogdevicesinc/libad9361-iio --depth 1 -b v0.3
@@ -262,7 +262,7 @@ cmake $build_args -DLIBIIO_LIBRARIES="$($(Get-Item ..\..\..\installed\$platform\
 cmake --build . --config Release
 cmake --install .
 cd ..\..
-rm -recurse -force libad9361-iio
+rm -recurse -force libad9361-iio -ErrorAction SilentlyContinue
 
 # Not compatible with ARM at this time
 if($platform -eq "x64-windows" -or $platform -eq "x86-windows")
@@ -279,7 +279,7 @@ if($platform -eq "x64-windows" -or $platform -eq "x86-windows")
     cmake --build . --config Release
     cmake --install .
     cd ..\..
-    rm -recurse -force LimeSuite
+    rm -recurse -force LimeSuite -ErrorAction SilentlyContinue
 }
 
 Write-Output "Building bladeRF..."
@@ -294,7 +294,7 @@ cmake $build_args $fx3_arg -DTREAT_WARNINGS_AS_ERRORS=OFF -DLIBPTHREADSWIN32_INC
 cmake --build . --config Release
 cmake --install .
 cd ..\..\..
-rm -recurse -force bladeRF
+rm -recurse -force bladeRF -ErrorAction SilentlyContinue
 
 # Not compatible with ARM at this time
 if($platform -eq "x64-windows" -or $platform -eq "x86-windows")
@@ -311,10 +311,10 @@ cmake $build_args -DENABLE_MAN_PAGES=OFF -DENABLE_MANUAL=OFF -DENABLE_PYTHON_API
 cmake --build . --config Release
 cmake --install .
 cd ..\..\..
-rm -recurse -force uhd
+rm -recurse -force uhd -ErrorAction SilentlyContinue
 
 cd ..
-rm -recurse -force build
+rm -recurse -force build -ErrorAction SilentlyContinue
 
 #Install SDRPlay API
 Invoke-WebRequest -Uri "https://www.satdump.org/SDRPlay.zip" -OutFile sdrplay.zip
