@@ -238,7 +238,8 @@ cmake $build_args -DLIBUSB_INCLUDE_DIRS="$($standard_include)" -DLIBUSB_LIBRARIE
 cmake --build . --config Release
 cmake --install .
 cd ..\..
-rm -recurse -force libfobos
+#rm -recurse -force libfobos
+rm -recurse -force libfobos -ErrorAction SilentlyContinue
 
 Write-Output "Building libiio..."
 git clone https://github.com/analogdevicesinc/libiio --depth 1 -b v0.26
